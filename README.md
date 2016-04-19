@@ -22,6 +22,15 @@
 
 ---
 
+## how to run 
+update your hosts with your apic server ip adddress
+update playbook with your situation 
+make it sure that ansible is installed on your labtop which run ansible-playbook
+if you'r using virtualenv then please check your python interpreter path on hosts file 
+run sample 3tierapp with below command 
+
+* $ansible-playbook -i hosts 3tierapp.yml 
+
 ## aci_filter_entry
 Manages filter entries that will be assigned to a filter
 

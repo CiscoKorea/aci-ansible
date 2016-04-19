@@ -1,7 +1,7 @@
 ---
 
 - name: playbook for aci testing
-  hosts: apic
+  hosts: lab #10.72.86.21 #name of apic server 
   connection: local
   gather_facts: no
 
@@ -47,13 +47,14 @@
         - DB_Con
 
     - name: ensure contract subject for web exists
-      aci_contract_subject: name=web_subject contract=Web_Con filters=Web_Filter tenant=ACILab host={{ inventory_hostname }}
+      aci_contract_subject: name=web_subject contract=Web_Con filters=Web_Filter tenant=ACILab host={{ inventory_hostname }} username={{ user}} password={{ pass }}
 
     - name: ensure contract subject for app exists
-      aci_contract_subject: name=web_subject contract=App_Con filters=App_Filter tenant=ACILab host={{ inventory_hostname }}
+      aci_contract_subject: name=web_subject contract=App_Con filters=App_Filter tenant=ACILab host={{ inventory_hostname }} username={{ user }} password={{ pass }}
 
     - name: ensure contract subject for db exists
-      aci_contract_subject: name=web_subject contract=DB_Con filters=DB_Filter tenant=ACILab host={{ inventory_hostname }}
+      aci_contract_subject: name=web_subject contract=DB_Con filters=DB_Filter tenant=ACILab host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+
 
 
     - name: ensure application network profile exists
@@ -65,11 +66,13 @@
         consumed_contracts: Web_Con
         provided_contracts: App_Con
         bridge_domain: ACILab_BD1
-        vmm_domain: My-vCenter
+#        vmm_domain: My-vCenter
         anp: 3Tier_App
         tenant: ACILab
         state: present
         host: "{{ inventory_hostname }}"
+        username: "{{ user }}"
+        password: "{{ pass }}"
 
     - name: ensure app epg exists
       aci_epg:
@@ -77,19 +80,23 @@
         consumed_contracts: App_Con
         provided_contracts: DB_Con
         bridge_domain: ACILab_BD1
-        vmm_domain: My-vCenter
+#        vmm_domain: My-vCenter
         anp: 3Tier_App
         tenant: ACILab
         state: present
         host: "{{ inventory_hostname }}"
+        username: "{{ user }}"
+        password: "{{ pass }}"
 
     - name: ensure db epg exists
       aci_epg:
         name: DB_EPG
         consumed_contracts: DB_Con
         bridge_domain: ACILab_BD1
-        vmm_domain: My-vCenter
+#        vmm_domain: My-vCenter
         anp: 3Tier_App
         tenant: ACILab
         state: present
         host: "{{ inventory_hostname }}"
+        username: "{{ user }}"
+        password: "{{ pass }}"

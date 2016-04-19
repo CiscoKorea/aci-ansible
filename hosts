@@ -1,7 +1,8 @@
-
-apic                     # single APIC in system- can also use IP if no DNS or /etc/hosts isn't setup
-
+[lab]
+# single APIC in system- can also use IP if no DNS or /etc/hosts isn't setup
+# ansible_python_interpreter for virtualenv, default python path =/usr/bin/python 
+10.72.86.21 ansible_python_interpreter=/Users/hyungsok/anaconda/bin/python
 
 [all:vars]
 user = 'admin'
-pass = 'C1sco12345'
+pass = '1234Qwer'
