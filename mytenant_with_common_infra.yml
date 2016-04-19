@@ -1,0 +1,91 @@
+---
+
+- name: playbook for aci tenant with common infra(vrf and bridge domain) 
+  hosts: lab #10.72.86.21 #name of apic server 
+  connection: local
+  gather_facts: no
+
+  tasks:
+
+    - name: ensure tenant exists with descr
+      aci_tenant: name=MyTenant descr='tenant by Ansible' host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+
+    - name: ensure filters exist
+      aci_filter: name={{ item }} tenant=MyTenant host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+      with_items:
+        - Web_Filter
+        - App_Filter
+        - DB_Filter
+
+    - name: entry for web filter
+      aci_filter_entry: name=web_filter proto=tcp tenant=MyTenant filter=Web_Filter dest_to_port=80 state=present host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+
+    - name: entry for app filter
+      aci_filter_entry: name=app_filter proto=tcp tenant=MyTenant filter=App_Filter dest_to_port=1433 state=present host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+
+    - name: entry for db filter
+      aci_filter_entry: name=db_filter proto=tcp tenant=MyTenant filter=DB_Filter dest_to_port=3306 state=present host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+
+
+
+    - name: ensure contracts exist
+      aci_contract: name={{ item }} tenant=MyTenant host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+      with_items:
+        - Web_Con
+        - App_Con
+        - DB_Con
+
+    - name: ensure contract subject for web exists
+      aci_contract_subject: name=web_subject contract=Web_Con filters=Web_Filter tenant=MyTenant host={{ inventory_hostname }} username={{ user}} password={{ pass }}
+
+    - name: ensure contract subject for app exists
+      aci_contract_subject: name=web_subject contract=App_Con filters=App_Filter tenant=MyTenant host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+
+    - name: ensure contract subject for db exists
+      aci_contract_subject: name=web_subject contract=DB_Con filters=DB_Filter tenant=MyTenant host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+
+
+
+    - name: ensure application network profile exists
+      aci_anp: name=MyApp tenant=MyTenant state=present host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+
+    - name: ensure web epg exists
+      aci_epg:
+        name: Web_EPG
+        consumed_contracts: Web_Con
+        provided_contracts: App_Con
+        bridge_domain: common_bd1
+#        vmm_domain: My-vCenter
+        anp: MyApp
+        tenant: MyTenant
+        state: present
+        host: "{{ inventory_hostname }}"
+        username: "{{ user }}"
+        password: "{{ pass }}"
+
+    - name: ensure app epg exists
+      aci_epg:
+        name: App_EPG
+        consumed_contracts: App_Con
+        provided_contracts: DB_Con
+        bridge_domain: common_bd1
+#        vmm_domain: My-vCenter
+        anp: MyApp
+        tenant: MyTenant
+        state: present
+        host: "{{ inventory_hostname }}"
+        username: "{{ user }}"
+        password: "{{ pass }}"
+
+    - name: ensure db epg exists
+      aci_epg:
+        name: DB_EPG
+        consumed_contracts: DB_Con
+        bridge_domain: common_bd2
+#        vmm_domain: My-vCenter
+        anp: MyApp
+        tenant: MyTenant
+        state: present
+        host: "{{ inventory_hostname }}"
+        username: "{{ user }}"
+        password: "{{ pass }}"

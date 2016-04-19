@@ -1,0 +1,19 @@
+---
+
+- name: playbook for aci common/infra  
+  hosts: lab #10.72.86.21 #name of apic server 
+  connection: local
+  gather_facts: no
+
+  tasks:
+
+    - name: ensure context for tenant exists (private network)
+      aci_context: name=common_vrf_1 descr='infra VRF1' tenant=common state=present host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+
+    - name: ensure bridge domain 1 exists
+      aci_bridge_domain: name=common_bd1 context=common_vrf_1 subnet=10.10.10.1/24 tenant=common state=present host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+
+    - name: ensure bridge domain 2 exists
+      aci_bridge_domain: name=common_bd2 context=common_vrf_1 subnet=20.20.20.1/24 tenant=common state=present host={{ inventory_hostname }} username={{ user }} password={{ pass }}
+
+
